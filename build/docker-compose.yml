@@ -14,7 +14,6 @@ services:
       - "8080" 
     depends_on:
       - consul
-      - logstash
     environment:
       - SPRING_PROFILES_ACTIVE=${profile}
     networks:
@@ -33,7 +32,6 @@ services:
       - rabbit
       - service-one-db
       - consul
-      - logstash
     environment:
       - SPRING_PROFILES_ACTIVE=${profile}
     networks:
@@ -75,7 +73,6 @@ services:
       - rabbit
       - service-two-db
       - consul
-      - logstash
     environment:
       - SPRING_PROFILES_ACTIVE=${profile}
     networks:
@@ -133,8 +130,8 @@ services:
       - CLUSTERED=true
       - RAM_NODE=true
       - CLUSTER_WITH=rabbit
-      - RABBITMQ_DEFAULT_USER=mudigal
-      - RABBITMQ_DEFAULT_PASS=mudigal
+      - RABBITMQ_DEFAULT_USER=docker
+      - RABBITMQ_DEFAULT_PASS=docker
     networks:
       - backend
 
@@ -198,71 +195,6 @@ services:
     command:
       - "--probe.docker"
       - "true"
-    networks:
-      - backend
-
-  # -----------------------------
-  # Log Vizualization 
-  # -----------------------------
-  kibana:
-    image: kibana:7.7.0
-    container_name: kibana
-    hostname: kibana
-    ports:
-      - "5601:5601"
-    expose:
-      - "5601"
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-    links:
-      - elasticsearch
-    networks:
-      - backend
-
-  # -----------------------------
-  # Indexing Server
-  # -----------------------------
-  elasticsearch:
-    image: elasticsearch:7.7.0
-    container_name: elasticsearch
-    hostname: elasticsearch
-    environment:
-      - "cluster.name=elasticsearch"
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "discovery.zen.ping.unicast.hosts=127.0.0.1"
-      - "discovery.type=single-node"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    expose:
-      - "9200"
-    networks:
-      - backend
-
-  # -----------------------------
-  # Log Collection and Format
-  # -----------------------------
-  logstash:
-    image: logstash:7.7.0
-    container_name: log-stash
-    hostname: logstash
-    ports:
-      - "5000:5000"
-    expose:
-      - "5000"
-    volumes:
-      - /Users/Shared/data/tools/logstash/:/tmp/
-    command: >
-      logstash --debug -e 'input { tcp { port => 5000 codec => json { charset => "UTF-8" } } } output { elasticsearch { hosts => "elasticsearch:9200" } }'
-    depends_on:
-      - elasticsearch
     networks:
       - backend
 
