@@ -15,59 +15,56 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 
-/**
- * @author Vijayendra Mudigal
- */
 @Configuration
 @Profile("!default")
 public class ServiceTwoRabbitMQBean implements RabbitListenerConfigurer {
 
-  public final static String queueName = "com.mudigal.microservices-sample.service-two";
-  public final static String exchangeName = "com.mudigal.microservices-sample.services-exchange";
-  public final static String routingKeyName = "com.mudigal.microservices-sample.service-*";
+    public final static String queueName = "com.mudigal.microservices-sample.service-two";
+    public final static String exchangeName = "com.mudigal.microservices-sample.services-exchange";
+    public final static String routingKeyName = "com.mudigal.microservices-sample.service-*";
 
-  @Bean
-  Queue queue() {
-    return new Queue(queueName, true);
-  }
+    @Bean
+    Queue queue() {
+        return new Queue(queueName, true);
+    }
 
-  @Bean
-  TopicExchange exchange() {
-    return new TopicExchange(exchangeName);
-  }
+    @Bean
+    TopicExchange exchange() {
+        return new TopicExchange(exchangeName);
+    }
 
-  @Bean
-  Binding binding(Queue queue, TopicExchange exchange) {
-    return BindingBuilder.bind(queue).to(exchange).with(routingKeyName);
-  }
+    @Bean
+    Binding binding(Queue queue, TopicExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(routingKeyName);
+    }
 
-  @Bean
-  public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
-    final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-    rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
-    return rabbitTemplate;
-  }
+    @Bean
+    public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
+        return rabbitTemplate;
+    }
 
-  @Bean
-  public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
-    return new Jackson2JsonMessageConverter();
-  }
+    @Bean
+    public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
 
-  @Bean
-  public MappingJackson2MessageConverter consumerJackson2MessageConverter() {
-    return new MappingJackson2MessageConverter();
-  }
+    @Bean
+    public MappingJackson2MessageConverter consumerJackson2MessageConverter() {
+        return new MappingJackson2MessageConverter();
+    }
 
-  @Bean
-  public DefaultMessageHandlerMethodFactory messageHandlerMethodFactory() {
-    DefaultMessageHandlerMethodFactory factory = new DefaultMessageHandlerMethodFactory();
-    factory.setMessageConverter(consumerJackson2MessageConverter());
-    return factory;
-  }
+    @Bean
+    public DefaultMessageHandlerMethodFactory messageHandlerMethodFactory() {
+        DefaultMessageHandlerMethodFactory factory = new DefaultMessageHandlerMethodFactory();
+        factory.setMessageConverter(consumerJackson2MessageConverter());
+        return factory;
+    }
 
-  @Override
-  public void configureRabbitListeners(final RabbitListenerEndpointRegistrar registrar) {
-    registrar.setMessageHandlerMethodFactory(messageHandlerMethodFactory());
-  }
+    @Override
+    public void configureRabbitListeners(final RabbitListenerEndpointRegistrar registrar) {
+        registrar.setMessageHandlerMethodFactory(messageHandlerMethodFactory());
+    }
 
 }

@@ -13,12 +13,6 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebFlux;
 
-/**
- * Swagger configuration
- *
- * @author vijmudig
- *
- */
 @Configuration
 @EnableSwagger2WebFlux
 @Profile("default")
@@ -32,12 +26,12 @@ class SwaggerConfig {
   }
 
   private ApiInfo apiInfo() {
-    return new ApiInfoBuilder().title("Microservices Sample - Service One").description(
-        "API documentation for service one reactive service with mongo database")
-                .termsOfServiceUrl("#")
-        .contact(new Contact("Vijayendra Mudigal", "https://vijayendra.mudigal.com", "vijayendrap@gmail.com.com"))
-        .license("Apache License 2.0")
-        .licenseUrl("#").version("5.0.0")
-        .build();
+    return new ApiInfoBuilder().title("Mastering Docker - Service One")
+                               .description("API documentation for service one reactive service with mongo database")
+                               .termsOfServiceUrl("#")
+                               .contact(new Contact("", "", ""))
+                               .license("Apache License 2.0")
+                               .licenseUrl("#").version("5.0.0")
+                               .build();
   }
 }

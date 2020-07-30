@@ -10,10 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-/**
- * @author Vijayendra Mudigal
- */
-
 @Data
 @Entity
 @ToString
@@ -23,11 +19,11 @@ import lombok.ToString;
 @Table(name = "name_value")
 public class NameValue {
 
-  @Id
-  @Column(name = "original_name", unique = true, nullable = false, columnDefinition = "VARCHAR(12)")
-  private String name;
+    @Id
+    @Column(name = "original_name", unique = true, nullable = false, columnDefinition = "VARCHAR(12)")
+    private String name;
 
-  @Column(name = "original_value", nullable = false, columnDefinition = "VARCHAR(50)")
-  private String value;
+    @Column(name = "original_value", nullable = false, columnDefinition = "VARCHAR(50)")
+    private String value;
 
 }

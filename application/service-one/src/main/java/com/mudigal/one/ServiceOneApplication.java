@@ -11,12 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import com.mudigal.one.domain.NameValue;
 import com.mudigal.one.service.NameValueService;
 
-/**
- * 
- * @author Vijayendra Mudigal
- *
- */
-
 @EnableScheduling
 @SpringBootApplication
 @EnableDiscoveryClient

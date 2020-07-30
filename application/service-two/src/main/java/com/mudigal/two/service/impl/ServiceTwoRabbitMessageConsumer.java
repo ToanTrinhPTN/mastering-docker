@@ -13,35 +13,31 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-/**
- * @author Vijayendra Mudigal
- */
 @Profile("!default")
 @Service("serviceTwoRabbitMessageConsumer")
 public class ServiceTwoRabbitMessageConsumer {
 
-  private Logger logger = LoggerFactory.getLogger(ServiceTwoRabbitMessageConsumer.class);
+    private Logger logger = LoggerFactory.getLogger(ServiceTwoRabbitMessageConsumer.class);
 
-  private NameValueService nameValueService;
+    private NameValueService nameValueService;
 
-  @Value("${spring.application.name}")
-  private String applicationName;
+    @Value("${spring.application.name}")
+    private String applicationName;
 
-  @Autowired
-  public ServiceTwoRabbitMessageConsumer(NameValueService nameValueService) {
-    this.nameValueService = nameValueService;
-  }
-
-  @RabbitListener(queues = ServiceTwoRabbitMQBean.queueName)
-  public void process(String data) {
-
-    logger.info(String.format("Received by %s data (%s) from RabbitMQ", applicationName, data));
-    try {
-      NameValueTO nameValueTO = new ObjectMapper().readValue(data, NameValueTO.class);
-      logger.info(String.format("Processed data as (%s)",nameValueTO));
-      nameValueService.updateNameValue(nameValueTO, true);
-    } catch (IOException e) {
-      e.printStackTrace();
+    @Autowired
+    public ServiceTwoRabbitMessageConsumer(NameValueService nameValueService) {
+        this.nameValueService = nameValueService;
     }
-  }
+
+    @RabbitListener(queues = ServiceTwoRabbitMQBean.queueName)
+    public void process(String data) {
+        logger.info(String.format("Received by %s data (%s) from RabbitMQ", applicationName, data));
+        try {
+            NameValueTO nameValueTO = new ObjectMapper().readValue(data, NameValueTO.class);
+            logger.info(String.format("Processed data as (%s)",nameValueTO));
+            nameValueService.updateNameValue(nameValueTO, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

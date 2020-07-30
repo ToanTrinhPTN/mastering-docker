@@ -4,12 +4,6 @@ import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 
- * @author Vijayendra Mudigal
- *
- */
-
 @RestController
 public class ApiGatewayMainController {
 

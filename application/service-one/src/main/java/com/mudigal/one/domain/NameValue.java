@@ -2,21 +2,12 @@ package com.mudigal.one.domain;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
-
-/**
- * 
- * @author Vijayendra Mudigal
- *
- */
 
 @Data
 @Document

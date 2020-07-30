@@ -15,11 +15,6 @@ import com.mudigal.one.component.queue.ServiceOneRabbitMQBean;
 import com.mudigal.one.model.NameValueTO;
 import com.mudigal.one.service.NameValueService;
 
-/**
- * 
- * @author Vijayendra Mudigal
- *
- */
 @Profile("!default")
 @Service("serviceOneRabbitMessageConsumer")
 public class ServiceOneRabbitMessageConsumer {
@@ -44,9 +39,7 @@ public class ServiceOneRabbitMessageConsumer {
 				// Update remaining name value pairs if the received data is not
 				// from the application that produced it. Example: service-one
 				if (!nameValueTO.getName().equals(nameValueFromDB.getName())) {
-					nameValueFromDB.getRemainingNameValuePair().put(
-							nameValueTO.getName(),
-							nameValueTO.getValue());
+					nameValueFromDB.getRemainingNameValuePair().put(nameValueTO.getName(),nameValueTO.getValue());
 					nameValueService.updateNameValue(nameValueFromDB, true);
 					logger.info("Processed data as (" + nameValueTO + ")");
 				}

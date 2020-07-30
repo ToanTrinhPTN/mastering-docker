@@ -9,11 +9,6 @@ import org.springframework.stereotype.Component;
 import com.mudigal.one.domain.NameValue;
 import com.mudigal.one.service.NameValueService;
 
-/**
- * 
- * @author Vijayendra Mudigal
- *
- */
 @Component
 public class ScheduledTask {
 

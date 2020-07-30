@@ -11,12 +11,6 @@ import com.mudigal.one.service.NameValueService;
 
 import reactor.core.publisher.Mono;
 
-/**
- * 
- * @author Vijayendra Mudigal
- *
- */
-
 @RestController
 @RequestMapping(value = "/")
 public class NameValueController {

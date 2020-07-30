@@ -16,11 +16,6 @@ import com.mudigal.one.service.impl.NameValueServiceImpl;
 
 import reactor.core.publisher.Mono;
 
-/**
- * 
- * @author Vijayendra Mudigal
- *
- */
 @Service
 public class NameValueServiceImpl implements NameValueService {
 

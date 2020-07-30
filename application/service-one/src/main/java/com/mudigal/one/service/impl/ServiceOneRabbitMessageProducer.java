@@ -13,11 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mudigal.one.component.queue.ServiceOneRabbitMQBean;
 import com.mudigal.one.model.NameValueTO;
 
-/**
- * 
- * @author Vijayendra Mudigal
- *
- */
 @Profile("!default")
 @Service("serviceOneRabbitMessageProducer")
 public class ServiceOneRabbitMessageProducer {
@@ -28,12 +23,9 @@ public class ServiceOneRabbitMessageProducer {
 	private RabbitTemplate rabbitTemplate;
 
 	public void sendMessageToQueue(final NameValueTO data) {
-
 		try {
-			logger.info("Sending message (" + data + ") to RabbitMQ's exchange ("
-					+ ServiceOneRabbitMQBean.exchangeName + ")");
-			this.rabbitTemplate.convertAndSend(ServiceOneRabbitMQBean.exchangeName,
-					ServiceOneRabbitMQBean.routingKeyName, new ObjectMapper().writeValueAsString(data));
+			logger.info("Sending message (" + data + ") to RabbitMQ's exchange ("+ ServiceOneRabbitMQBean.exchangeName + ")");
+			this.rabbitTemplate.convertAndSend(ServiceOneRabbitMQBean.exchangeName,ServiceOneRabbitMQBean.routingKeyName, new ObjectMapper().writeValueAsString(data));
 		} catch (MessagingException | JsonProcessingException e) {
 			logger.error("Error sending data: " + data + " to RabbitMQ. \n" + e.getMessage());
 		}

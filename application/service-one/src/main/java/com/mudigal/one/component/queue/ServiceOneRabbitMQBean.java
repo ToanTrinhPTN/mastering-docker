@@ -15,12 +15,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 
-/**
- * RabbitMQ bean configurations
- * 
- * @author Vijayendra Mudigal
- *
- */
 @Configuration
 @Profile("!default")
 public class ServiceOneRabbitMQBean implements RabbitListenerConfigurer {

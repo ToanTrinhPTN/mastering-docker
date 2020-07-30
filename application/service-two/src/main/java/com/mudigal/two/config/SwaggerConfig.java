@@ -11,29 +11,30 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-/**
- * Swagger configuration
- *
- * @author Vijayendra Mudigal
- */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
 
-  @Bean
-  public Docket api() {
-    return new Docket(DocumentationType.SWAGGER_2).select()
-        .apis(RequestHandlerSelectors.basePackage("com.mudigal.two")).paths(PathSelectors.any())
-        .build()
-        .apiInfo(generateApiInfo());
-  }
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2).select()
+                .apis(RequestHandlerSelectors.basePackage("com.mudigal.two"))
+                .paths(PathSelectors.any())
+                .build()
+                .apiInfo(generateApiInfo());
+    }
 
-  private ApiInfo generateApiInfo() {
-    return new ApiInfo("Microservices Sample - Service Two",
-        "API documentation for service two service with h2/mysql database", "5.0.0", "",
-        new Contact("Vijayendra Mudigal", "https://vijayendra.mudigal.com",
-            "vijayendrap@gmail.com"), "Apache License 2.0", "#",
-        Collections.emptyList());
-  }
+    private ApiInfo generateApiInfo() {
+        return new ApiInfo(
+                "Mastering Docker - Service Two",
+                "API documentation for service two service with h2/mysql database",
+                "5.0.0",
+                "",
+                new Contact("", "", ""),
+                "Apache License 2.0",
+                "#",
+                Collections.emptyList()
+        );
+    }
 
 }
