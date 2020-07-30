@@ -1,4 +1,4 @@
-//package com.mudigal;
+//package com.github;
 //
 //import org.junit.Test;
 //import org.junit.runner.RunWith;

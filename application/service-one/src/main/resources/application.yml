@@ -37,7 +37,7 @@ spring:
 logging:
   level:
     org.springframework.web: DEBUG
-    com.mudigal.one: DEBUG
+    com.github.one: DEBUG
     org.hibernate: DEBUG
 
 ---
@@ -69,5 +69,5 @@ logstash.servers: logstash:5000
 logging:
   level:
     org.springframework.web: DEBUG
-    com.mudigal.one: DEBUG
+    com.github.one: DEBUG
     org.hibernate: DEBUG

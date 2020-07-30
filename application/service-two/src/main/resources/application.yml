@@ -49,7 +49,7 @@ spring:
 logging:
   level:
     org.springframework.web: WARN
-    com.mudigal.one: INFO
+    com.github.one: INFO
 
 ---
 # DOCKER CONFIGURATION
@@ -94,5 +94,5 @@ logging:
     file: "%d %-5level [%thread] %logger{0}: %msg%n"
   level:
     org.springframework.web: WARN
-    com.mudigal.two: DEBUG
+    com.github.two: DEBUG
     org.hibernate: WARN
