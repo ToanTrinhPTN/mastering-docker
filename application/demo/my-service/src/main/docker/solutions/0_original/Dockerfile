@@ -3,10 +3,8 @@ LABEL author="Phong Pham"
 LABEL maintainer="pnqphong95@gmail.com"
 
 # Install jdk, maven
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    maven \
-    openjdk-8-jdk \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    maven openjdk-8-jdk
 
 # Create a directory where our app will be placed
 RUN mkdir -p /usr/src/app
