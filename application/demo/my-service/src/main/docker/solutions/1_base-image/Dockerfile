@@ -17,4 +17,4 @@ COPY . /usr/src/app
 RUN mvn clean package
 
 EXPOSE 8082
-ENTRYPOINT ["java", "-Xmx256m", "-Xss32m", "-Djava.security.egd=file:/dev/./urandom","-jar","target/service-one.jar"]
+ENTRYPOINT ["java","-jar","target/my-service.jar"]

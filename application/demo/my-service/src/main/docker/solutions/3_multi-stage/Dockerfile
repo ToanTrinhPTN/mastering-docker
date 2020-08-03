@@ -18,8 +18,8 @@ RUN mvn clean package
 # Define second stage, consume the artifact from stage "builder". This stage release final image.
 FROM openjdk:8-jre-alpine
 
-COPY --from=builder /usr/src/app/target/service-one.jar /
+COPY --from=builder /usr/src/app/target/my-service.jar /
 
 EXPOSE 8082
-ENTRYPOINT ["java", "-Xmx256m", "-Xss32m", "-Djava.security.egd=file:/dev/./urandom","-jar","/service-one.jar"]
+ENTRYPOINT ["java","-jar","target/my-service.jar"]
 

@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM pnqphong/aaworkshop:ubuntu-18.04
 LABEL author="Phong Pham"
 LABEL maintainer="pnqphong95@gmail.com"
 
@@ -20,4 +20,4 @@ RUN mvn clean package
 
 # Define entry point which can be executed when container start
 EXPOSE 8082
-ENTRYPOINT ["java", "-Xmx256m", "-Xss32m", "-Djava.security.egd=file:/dev/./urandom","-jar","target/service-one.jar"]
+ENTRYPOINT ["java","-jar","target/my-service.jar"]
