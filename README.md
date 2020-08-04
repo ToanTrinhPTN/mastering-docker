@@ -10,7 +10,7 @@ Dockerize an application
 
 #### Application architecture
 
-<architecture image>
+
 
 
 
@@ -86,7 +86,7 @@ CMD ["npm", "start"]
 Build the image
 
 ```bash
-$ docker build -t nginx:1.18.0-alpine .
+$ docker build -t build_web-application .
 ```
 
 
@@ -139,7 +139,7 @@ Write this content to the file
 FROM openjdk:8-jdk
 
 # environment
-EXPOSE 8084
+EXPOSE 8082
 
 # executable ADD @project.artifactId@-@project.version@.jar app.jar
 ADD target/service-one.jar app.jar
@@ -211,9 +211,155 @@ $ docker volume create build_mongodata
 
 ### Part 4: Run Docker containers
 
+**Step 1: Run services database**
+
+```bash
+$ docker run -d --tty --init --privileged \
+			 -p 3310:3306 \
+			 --expose 3310 \
+			 --network build_backend \
+			 --hostname servicetwodb \
+			 --name service-two-db \
+			 --env MYSQL_ROOT_PASSWORD=root123 \
+			 --env MYSQL_DATABASE=service-two \
+			 --env MYSQL_USER=service-two \
+			 --env MYSQL_PASSWORD=service-two \
+			 mysql/mysql-server:5.7
+```
+
+```bash
+$ docker run -d --tty --init --privileged \
+			 -p 27017:27017 \
+			 --expose 27017 \
+			 --network build_backend \
+			 --hostname serviceonedb \
+			 --name service-one-db \
+			 --env MONGODB_USER="service-one" \
+			 --env MONGODB_PASS="service-one" \
+			 --env MONGO_DATA_DIR=/data/db \
+			 --env MONGO_LOG_DIR=/dev/null \
+			 --volume build_mongodata:/data/db \
+			 mongo:3.7 mongod --smallfiles
+```
+
+
+
+**Step 2: Run web-application**
+
+```bash
+$ docker run -d --tty --init --privileged \
+			 -p 80:4200 \
+			 --network build_frontend \
+			 --name web-application \
+			 --volume dist:/usr/share/nginx/html \
+			 build_web-application
+```
+
+
+
+**Step 3: Run service registration and discovery** 
+
+```bash
+$ docker run -d --tty --init --privileged \
+			 -p 8500:8500 \
+			 -p 8600:8600 \
+			 --network build_backend \
+			 --hostname consul \
+			 --name consul \
+			 --volume data:/consul/data \
+			 consul:1.7.3 agent -server -client 0.0.0.0 -ui -bootstrap-expect=1 -data-dir=consul/data -datacenter=blr
+```
+
+
+
+**Step 4: Run messaging queue**
+
+```bash
+$ docker run -d --tty --init --privileged \
+			 -p 5672:5672 \
+			 -p 15672:15672 \
+			 --expose 15672 \
+			 --network build_backend \
+			 --hostname rabbitmq \
+			 --name rabbit-mq \
+			 --env CLUSTERED=true \
+			 --env RAM_NODE=true \
+			 --env CLUSTER_WITH=rabbit \
+			 --env RABBITMQ_DEFAULT_USER=docker \
+			 --env RABBITMQ_DEFAULT_PASS=docker \
+			 rabbitmq:3.8-management-alpine
+```
+
+
+
+**Step 5: Run service API gateway**
+
+```bash
+$ docker run -d --tty --init --privileged \
+			 -p 8080:8080 \
+			 --expose 8080 \
+			 --network build_backend \
+			 --hostname api-gateway \
+			 --name api-gateway \
+			 --env SPRING_PROFILES_ACTIVE=docker \
+			 build_api-gateway
+```
+
+
+
+**Step 6: Run services**
+
+Run service-two
+
+```bash
+$ docker run -d --tty --init --privileged \
+			 -p 8084:8084 \
+			 --network build_backend \
+			 --hostname service-two \
+			 --name service-two \
+			 --env SPRING_PROFILES_ACTIVE=docker \
+			 build_service-two
+```
+
+Test service-two by
+
+```bash
+$ curl -X GET http://localhost:8084/ | json_pp
+```
+
+
+
+Run service-one
+
+```bash
+$ docker run -d --tty --init --privileged \
+			 -p 8082:8082 \
+			 --network build_backend \
+			 --hostname service-one \
+			 --name service-one \
+			 --env SPRING_PROFILES_ACTIVE=docker \
+			 build_service-one
+```
+
+Test service-one by
+
+```bash
+$ curl -X GET http://localhost:8082/ | json_pp
+```
+
+
+
+
+
+**Step final: Check you result**
+
+Access to: http://localhost
+
 
 
 ### Part 5: Optimize Docker images
+
+
 
 **Optimize 1: Don't install unnecessary dependencies**
 
@@ -223,6 +369,8 @@ Using a --no-install-recommends when apt-get installing packages. This will resu
 RUN apt-get update && apt-get install -y --no-install-recommends
 ```
 
+
+
 **Optimize 2: Remove apt library cache**
 
 Use of apt-get update should be paired with rm -rf /var/lib/apt/lists/* in the same layer.
@@ -230,6 +378,8 @@ Use of apt-get update should be paired with rm -rf /var/lib/apt/lists/* in the s
 ```dockerfile
 RUN apt-get update && rm -rf /var/lib/apt/lists/*
 ```
+
+
 
 **Optimize 3: Use .dockerignore file**
 
@@ -245,6 +395,8 @@ target/
 src/main/docker/
 ```
 
+
+
 **Optimize 4: Choose correct base image**
 
 - Don't use latest tag because it's change frequently.
@@ -256,6 +408,8 @@ FROM node:12-alpine ## instead of "FROM node:12"
 FROM postgres:9.6-alpine ## instead of "FROM postgres:9.6"
 ..
 ```
+
+
 
 **Optimize 5: Order matters for caching**
 
@@ -283,6 +437,8 @@ COPY . /usr/src/app
 RUN mvn clean package
 ..
 ```
+
+
 
 **Optimize 6: Use multi-stage if needed**
 
@@ -341,3 +497,9 @@ COPY --from=packaging /usr/src/app/target/my-service.jar /
 EXPOSE 8082
 ENTRYPOINT ["java","-jar","/my-service.jar"]
 ```
+
+
+
+### Part Final: Migrate to Docker Compose (Optional)
+
+Continue migrate to Docker Compose

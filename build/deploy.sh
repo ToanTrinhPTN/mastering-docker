@@ -23,4 +23,4 @@ cd ../build/
 export profile=$1
 
 # Deploy
-docker-compose up --build -d
+docker-compose up --build -d 
