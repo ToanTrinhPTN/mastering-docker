@@ -55,3 +55,26 @@ $ docker run -d -v test-vol:/world docker-node-ibm
 ```
 
 - Optimize Docker images
+
+  - Reduce image size
+    - Don't install unnecessary dependencies
+      Consider using a --no-install-recommends when apt-get installing packages. This will result in a smaller image size.
+      > RUN apt-get update && apt-get install -y --no-install-recommends
+
+    - Remove apt library cache
+      Use of apt-get update should be paired with rm -rf /var/lib/apt/lists/* in the same layer.
+      > RUN apt-get update && rm -rf /var/lib/apt/lists/*
+
+    - Use .dockerignore file
+      Use docker ignore file on the root of context directory to ignore stuff we don't want to keep when building docker image.
+      https://docs.docker.com/engine/reference/builder/#dockerignore-file
+
+    - Choose correct base image
+      - Don't use latest tag because it's change frequently.
+      - Prefer minimal version (use image with _-alpine_ suffix).
+      - Use official image
+
+
+    - Incremental build time
+      - Order matters for caching
+      - More specific COPY to limit cache busts
