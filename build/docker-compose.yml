@@ -105,7 +105,7 @@ services:
     image: nginx:1.18.0-alpine
     build:
       context: ../application/web-application
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./dist:/usr/share/nginx/html
     ports:
