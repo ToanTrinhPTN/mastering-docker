@@ -1,80 +1,219 @@
-# mastering-docker
+# Mastering Docker
 
-Hand-on use case guideline:
+### Part 1: Overview
 
-- Build Dockerfile
+#### Use case
 
-- Build Docker images
+Dockerize an application
 
-- Manage Docker Registry (tag, version)
 
-  - Create a tag with syntax: 
-  
-    >   docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
 
-    >   example: docker tag imageName myUsernameInDockerHub/imageName:version1
-  
-  - Before pushing image, you need to login first. Otherwise you will get an access denied log.
-  
-  - Login with username and password
-  
-    > docker login
-  
-    > enter username and password
-  
-  - Pushing image to registry with syntax:
-  
-    > docker push [OPTIONS] NAME[:TAG]
-  
-    > Example: docker push myUsernameInDockerHub/imageName:version1
-    
-  
-- Manage Docker Network and Volume
+#### Application architecture
 
-```sh
-# list out all the current network
-$ docker network ls
+<architecture image>
 
-# create a network named 'my_bridge' with driver bridge
-$ docker network create -d bridge my_bridge
 
-# run the container with defaut network bridge 
-$ docker run -itd --name=networktest ubuntu
 
-#inspect network bridge, bridge is default and undeleteable
-$ docker network inspect bridge 
+#### Technology
 
-#disconnect container networktest from network bridge
-$ docker network disconnect bridge networktest
+- Spring Boot - Application framework
+- Zuul - API Gateway (Load Balancer)
+- Consul - Service registration and Discovery
+- RabbitMQ - asynchronous microservices messaging.
+- Angular, Bootstrap & jQuery - HTML enhanced for web apps!
+- Swagger - API documentation
 
-# create a volume named 'test-vol' with default driver local
-$ docker volume create test-vol
 
-# run with volume test-vol and mount it to /world
-$ docker run -d -v test-vol:/world docker-node-ibm
+
+#### Tools
+
+Ensure your machine installed:
+
+- Git
+- JDK8
+- Maven
+- NodeJS
+- Docker Desktop
+
+
+
+### Part 2: Create Docker images
+
+**Step 1: Clone the repository**
+
+Repository: <tbd>
+
+Stay on checked out folder and execute following command
+
+
+
+**Step 2: Build web-application image**
+
+Create Dockerfile
+
+```bash
+$ cd application
+$ mvn clean package 
+$ cd web-application
+$ nano Dockerfile
 ```
 
-- Optimize Docker images
+Write this content to the file
 
-  - Reduce image size
-    - Don't install unnecessary dependencies
-      Consider using a --no-install-recommends when apt-get installing packages. This will result in a smaller image size.
-      > RUN apt-get update && apt-get install -y --no-install-recommends
+```dockerfile
+# Create image based on the official Node 12 image from dockerhub
+FROM node:12-alpine
 
-    - Remove apt library cache
-      Use of apt-get update should be paired with rm -rf /var/lib/apt/lists/* in the same layer.
-      > RUN apt-get update && rm -rf /var/lib/apt/lists/*
+# Create a directory where our app will be placed
+RUN mkdir -p /usr/src/app
 
-    - Use .dockerignore file
-      Use docker ignore file on the root of context directory to ignore stuff we don't want to keep when building docker image.
-      https://docs.docker.com/engine/reference/builder/#dockerignore-file
+# Change directory so that our commands run inside this new directory
+WORKDIR /usr/src/app
 
-    - Choose correct base image
-      - Don't use latest tag because it's change frequently.
-      - Prefer minimal version (use image with _-alpine_ suffix).
-      - Use official image
+# Copy dependency definitions
+COPY package.json /usr/src/app
+
+# Install dependecies
+RUN npm install
+
+# Get all the code needed to run the app
+COPY . /usr/src/app
+
+# Expose the port the app runs in
+EXPOSE 4200
+
+# Serve the app
+CMD ["npm", "start"]
+```
+
+Build the image
+
+```bash
+$ docker build -t nginx:1.18.0-alpine .
+```
 
 
-    - Incremental build time
-      - Order matters for caching
-      - More specific COPY to limit cache busts
+
+**Step 3: Build service-two image**
+
+Create Dockerfile
+
+```bash
+$ cd ../service-two
+$ nano Dockerfile
+```
+
+Write this content to the file
+
+```dockerfile
+FROM openjdk:8-jre-alpine
+
+# environment
+EXPOSE 8084
+
+# executable ADD @project.artifactId@-@project.version@.jar app.jar
+ADD target/service-two.jar app.jar
+
+# run app as user 'booter'
+RUN /bin/sh -c 'touch /app.jar'
+ENTRYPOINT ["java", "-Xmx256m", "-Xss32m", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+```
+
+Build the image
+
+```bash
+$ docker build -t build_service-two:latest .
+```
+
+
+
+**Step 4: Build service-one image**
+
+Create Dockerfile
+
+```bash
+$ cd ../service-one
+$ nano Dockerfile
+```
+
+Write this content to the file
+
+```dockerfile
+FROM openjdk:8-jre-alpine
+
+# environment
+EXPOSE 8084
+
+# executable ADD @project.artifactId@-@project.version@.jar app.jar
+ADD target/service-one.jar app.jar
+
+# run app as user 'booter'
+RUN /bin/sh -c 'touch /app.jar'
+ENTRYPOINT ["java", "-Xmx256m", "-Xss32m", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+```
+
+Build the image
+
+```bash
+$ docker build -t build_service-one:latest .
+```
+
+
+
+**Step 5: Build api-gateway image**
+
+Create Dockerfile
+
+```bash
+$ cd ../api-gateway
+$ nano Dockerfile
+```
+
+Write this content to the file
+
+```dockerfile
+FROM openjdk:8-jre-alpine
+
+# environment
+EXPOSE 8080
+
+# executable ADD @project.artifactId@-@project.version@.jar app.jar
+ADD target/api-gateway.jar app.jar
+
+# run app as user 'booter'
+RUN /bin/sh -c 'touch /app.jar'
+ENTRYPOINT ["java", "-Xmx256m", "-Xss32m", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+```
+
+Build the image
+
+```bash
+$ docker build -t build_api-gateway:latest .
+```
+
+
+
+### Part 3: Create Docker networks and volumes
+
+**Step 1: Create Docker networks**
+
+```bash
+$ docker network create -d bridge build_backend
+$ docker network create -d bridge build_frontend
+```
+
+
+
+**Step 2: Create Docker volumes**
+
+```bash
+$ docker volume create build_mongodata
+```
+
+
+
+### Part 4: Run Docker containers
+
+
+
+### Part 5: Optimize Docker images
