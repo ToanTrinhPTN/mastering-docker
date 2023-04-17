@@ -14,8 +14,9 @@ services:
       - "8080" 
     depends_on:
       - consul
+      - rabbit
     environment:
-      - SPRING_PROFILES_ACTIVE=${profile}
+      - SPRING_PROFILES_ACTIVE=docker
     networks:
       - backend
 
@@ -25,15 +26,17 @@ services:
   service-one:
     container_name: "service-one"
     hostname: "service-one"
-    build: ../application/service-one/target
+    build: 
+      context: ../application/service-one/
+      dockerfile: ./Dockerfile
     ports:
       - "8082:8082"
     depends_on:
-      - rabbit
+      # - rabbit
       - service-one-db
       - consul
     environment:
-      - SPRING_PROFILES_ACTIVE=${profile}
+      - SPRING_PROFILES_ACTIVE=docker
     networks:
       - backend
 
@@ -50,13 +53,12 @@ services:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
     volumes:
-      - mongodata:/data/db
+      - ./mongodata:/data/db
     ports:
       - "27017:27017"
     expose:
       - "27017"
     command: mongod --smallfiles 
-    #--logpath=/dev/null --sslDisabledProtocols 'none'
     networks:
       - backend
 
@@ -74,7 +76,7 @@ services:
       - service-two-db
       - consul
     environment:
-      - SPRING_PROFILES_ACTIVE=${profile}
+      - SPRING_PROFILES_ACTIVE=docker
     networks:
       - backend
 
@@ -119,8 +121,8 @@ services:
   # ---------------------------
   rabbit:
     image: rabbitmq:3.8-management-alpine
-    container_name: rabbit-mq
-    hostname: rabbitmq
+    container_name: rabbit
+    hostname: rabbit
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -140,7 +142,7 @@ services:
   # Discovery Cluster
   # ---------------------------
   consul:
-    image: consul:1.7.3
+    image: consul:1.7.3 
     container_name: "consul"
     hostname: "consul"
     command: consul agent -server -client 0.0.0.0 -ui -bootstrap-expect=1 -data-dir=/consul/data -datacenter=blr
@@ -151,7 +153,8 @@ services:
       - "8500"
       - "8600"
     networks:
-      - backenddocker network create -d bridge build_backend
+      - backend
+     
 
 networks:
   frontend:
